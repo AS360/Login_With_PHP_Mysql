@@ -1,220 +1,97 @@
 <?php
-if(isset($_GET['retcode'])) {
+   // Database connection!
+   include 'dbconn.php';
 
-    if($_GET['retcode'] == 1) {
-       echo "<script>";
-       echo  "alert('please entre your name')";
-       echo "</script>";
-    }
-}
+   session_start();
+   
+   if($_SERVER["REQUEST_METHOD"] == "POST") {
+      
+      $myusername = $_POST['email'];
+      $mypassword = $_POST['password']; 
+      
+      $sql = "SELECT id FROM user WHERE email = '$myusername' and password = '$mypassword'";
+      $result = mysqli_query($dbconn,$sql);
+      $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+      
+      $count = mysqli_num_rows($result);
+		
+      if($count == 1) {
+         $_SESSION['login_user'] = $myusername;
+         header("location: home.php");
+      }else {
+        echo '<h5>';
+        echo 'Invalid Credentials, Please Fill Details Correctly';
+        echo '</h5>';
+      }
+   }
 ?>
+
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Add icon library -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-<style>
-body {font-family: Arial, Helvetica, sans-serif;}
-* {box-sizing: border-box;}
-
-.input-container {
-  display: -ms-flexbox;
-  display: flex;
-  width: 100%;
-  margin-bottom: 5px;
-}
-
-.icon {
-  padding: 10px;
-  background: royalblue;
-  color: white;
-  min-width: 50px;
-  text-align: center;
-}
-
-.input-field {
-  width: 100%;
-  padding: 10px;
-  outline: none;
-}
-
-.input-field:focus {
-  border: 2px solid yellow;
-}
-
-/* Set a style for the submit button */
-.btn {
-  background-color: green;
-  color: white;
-  padding: 10px 10px;
-  cursor: pointer;
-  border: none;
-  width: 100%;
-  opacity: 1;
-}
-
-.bttn {
-  background-color: yellowgreen;
-  color: white;
-  padding: 10px 10px;
-  cursor: pointer;
-  border: none;
-  width: 100%;
-  opacity: 1;
-}
-
-.btn:hover {
-  opacity: 1;
-}
-
-@media only screen and (max-width:800px) {
-  /* For tablets: */
-  .main {
-    width: 80%;
-    padding: 0;
-  }
-  .right {
-    width: 100%;
-  }
-}
-@media only screen and (max-width:500px) {
-  /* For mobile phones: */
-  .menu, .main, .right {
-    width: 100%;  
-  }
-}
-
-</style>
+  <title>Login</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    .bttn {
+      font-size: 20px;
+      width: 100%;
+    }
+    .btm_link {
+      display: flex;
+      justify-content: center;
+    }
+    .page {
+      border: 2px solid #6237ff;
+      border-radius: 10px;
+      width: 50%;
+      padding: 10px;
+      box-shadow: 5px 5px #b6b9ff;
+    }
+    h2 {
+      text-align: center;
+    }
+    h5 {
+            padding-top: 10px;
+            text-align: center;
+            color: red;
+            animation: animatezoom 0.6s
+    }
+    @keyframes animatezoom {
+            from {
+                transform: scale(0)
+            }
+            to {
+                transform: scale(1)
+            }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="w3-animate-top">
-  <form name="myForm" action="indexaction.php" style="max-width:500px;margin:auto" enctype="multipart/form-data" onsubmit="return validateForm()" method="POST">
-  <h2>Register Form</h2>
-  <div class="input-container">
-    <i class="fa fa-user icon"></i>
-    <input type="text" class="input-field" placeholder="Enter Name" id="name" name="name">
+  <div class="container page mt-3">
+    <h2>Login Form</h2>
+    <form action="" autocomplete="off" method="POST">
+      <div class="mb-3 mt-3">
+        <label for="email">Username</label>
+        <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" placeholder="Enter password" name="password">
+      </div>
+      <button type="submit" class="bttn btn btn-primary px-3">Login</button>
+      <div class="btm_link">
+        <p class="pt-2">Don't have an account?<a href="./register.php">Register</a></p>
+      </div>
+    </form>
   </div>
-
-  <div class="input-container">
-    <i class="fa fa-phone icon"></i>
-    <input type="number" class="input-field" placeholder="Enter Number" id="i_nb" name="number">
-  </div>
-  
-  <div class="input-container">
-    <i class="fa fa-envelope icon"></i>
-    <textarea type="text" class="input-field" placeholder="Write Something..." id="t_area" name="t_area"></textarea>
-  </div>
-
-  <div class="input-container">
-    <i class="fa fa-file icon"></i>
-    <input type="file" class="input-field" placeholder="Enter Name" id="f_name" name="filename" multiple>
-  </div>
-
-  <div class="input-container" id="hello">
-    <i class="fa fa-code icon"></i>&nbsp; &nbsp;
-      <label for="html">HTML<input type="radio" id="html" name="fav_language" value="HTML"></label>
-      <label for="css">CSS<input type="radio" id="css" name="fav_language" value="CSS"></label>
-      <label for="javascript">JS<input type="radio" id="javascript" name="fav_language" value="JavaScript">
-      </label>
-  </div>
-
-  <div class="input-container">
-    <i class="fa fa-star-o icon"></i>
-    <select class="input-field" id="fruits" name="fruits">
-      <option value="">Select</option>
-      <option value="apple" name="apple">Apple</option>
-      <option value="mango" name="mango">Mango</option>
-      <option value="orange" name="orange">Orange</option>
-    </select>
-  </div>
-
-  <input type="checkbox" id="checkbox" name="checkbox" value="check" />You argeed to <a href="">Terms and Condition</a>
-  <br><br>
-  <button type="submit" class="btn" id="myButton">SUBMIT</button><br><br>
-  <button type="reset" class="bttn" id="myButton1">RESET</button>
-  </form>
-</div>
-
-<script type="text/javascript">
-   onclick="getElementById("myButton1").reset()";   
-</script>
-<scripr src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></scripr>
-<script type="text/javascript">
-  function validateForm() {
-
-    var name = document.getElementById('name').value;
-    if(name === "" || name === null){
-       alert("Enter Your Name");
-       document.getElementById('name').focus();
-        return false;
-    }
-
-    var num_val = document.getElementById('i_nb').value;
-    if(num_val.toString().length != 10){
-       alert("Not a valid Phone Number. Please enter 10 digit number");
-       document.getElementById('i_nb').focus();
-        return false;
-    }
-
-    var textarea = document.getElementById('t_area').value;
-    if(textarea.toString().length <= 10 || textarea.toString().length >= 20){
-       alert("Write between 10 to 20 character");
-       document.getElementById('t_area').focus();
-        return false;
-    }  
-
-
-  var x = document.getElementById('f_name').value;
-  var cunt = document.getElementById('f_name').count
-  var sizeEle = document.getElementById('f_name').size; // byte
-  var ext = x.substring(x.lastIndexOf('.') + 1);
-
-// alert(cunt);
-// return false;
-
-  if (x === "" || x === null) {
-    alert("Choose a PDF file");
-    document.getElementById('f_name').focus();
-    return false;
-  }
-
-  if(ext != "pdf"){
-    alert("Upload PDF file only");
-    document.getElementById('f_name').focus();
-    return false;
-  }
-
-  if(sizeEle > 2048 ){
-    alert("Upload file bigger than 2 KB");
-    document.getElementById('f_name').focus();
-    return false;
-  }
-
-  var getSelectedValue = document.querySelector('input[name="fav_language"]:checked');
-    if(getSelectedValue === null){
-      alert("Select your favourite language");
-      document.getElementById('hello').focus();
-      return false;
-    }
-
-  var fru = document.getElementById("fruits").value;
-        if (fru == "") {
-            alert("Please select an option!");
-            document.getElementById('fruits').focus();
-            return false;
-        }
-
-  var checkbox = document.getElementById('checkbox').checked;
-    if (checkbox == false) {
-      alert("You must agree to the terms and condition.");
-      document.getElementById('checkbox').focus();
-      return false;
-    }
-}
-</script>
 
 </body>
+
 </html>
